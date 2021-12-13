@@ -82,9 +82,9 @@ int cstore_extract(std::string password, std::string archivename, std::vector<st
 	for(int i = 0; i < SHA256_BLOCK_SIZE; i++){
 		if(hmac_from_archive[i] != computed_hmac[i]){
 			fclose(archive);
-            die("HMACs are different");
-        }
-    }
+			die("HMACs are different");
+		}
+	}
 
 	// Loop through all files
 	for(int j = 0; j < filenames_len; j++){
