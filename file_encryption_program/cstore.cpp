@@ -13,7 +13,11 @@ int main(int argc, char* argv[])
 {
     // Check correct number of arguments (minimum 3)
     if(argc < 3){
-        show_usage(argv[0]);
+        std::cerr << "Usage: ./cstore <function> [-p password] archivename <files>\n"
+            << "<function> can be: list, add, extract, delete.\n"
+            << "Options:\n"
+            << "\t-p <PASSWORD>\t\t Specify password (plaintext) in console. If not supplied, user will be prompted."
+            << std::endl;
         return 1;
     }
 
