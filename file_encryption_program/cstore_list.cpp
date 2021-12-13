@@ -6,7 +6,6 @@
 
 typedef unsigned char BYTE;
 
-// Change argument as needed
 int cstore_list(std::string archivename)
 {
     if(access(&archivename[0], 0) != 0){
@@ -21,7 +20,7 @@ int cstore_list(std::string archivename)
 	int contents_length = ftell(fp);
 	rewind(fp);
 
-	// read contents into buffer
+	// Read contents into buffer
 	BYTE contents_buf[contents_length];
 	fread(contents_buf, contents_length, 1, fp);
 

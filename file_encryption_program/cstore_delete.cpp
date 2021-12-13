@@ -5,14 +5,18 @@
 
 typedef unsigned char BYTE;
 
-// Update Argument as you see fit.
 int cstore_delete(std::string password, std::string archivename, std::vector<std::string> filenames)
-{
-	// Make key from password
+{	
+	// 1. Create encryption key
+	// 2. Compute HMAC
+	// 3. Iterate through archive and see which files to delete
+	// 4. Recompute HMAC, etc.
+
+	// Make encryption key from password
 	BYTE key[SHA256_BLOCK_SIZE];
 	iterate_sha256(password, key, 10000);
 
-	// make HMAC key
+	// Make HMAC key
 	BYTE hmac_key[SHA256_BLOCK_SIZE];
 	BYTE key_to_hash[SHA256_BLOCK_SIZE+1];
 	for(int i = 0; i < SHA256_BLOCK_SIZE; i++){
@@ -21,7 +25,7 @@ int cstore_delete(std::string password, std::string archivename, std::vector<std
 	key_to_hash[SHA256_BLOCK_SIZE] = 'I';
 	hash_sha256(key_to_hash, hmac_key, SHA256_BLOCK_SIZE+1);
 
-	// check if archive exists
+	// Check if archive exists
 	if(access(&archivename[0], 0) == 0){
 		// check if files exist in archive
 		std::string archive_contents_name = archivename + "_contents";
@@ -31,7 +35,7 @@ int cstore_delete(std::string password, std::string archivename, std::vector<std
 		int contents_length = ftell(fp);
 		rewind(fp);
 
-		// read contents into buffer
+		// Read contents into buffer
 		BYTE contents_buf[contents_length];
 		fread(contents_buf, contents_length, 1, fp);
 
@@ -44,7 +48,7 @@ int cstore_delete(std::string password, std::string archivename, std::vector<std
 			}
 		}
 
-		// get hmac and compare
+		// Get hmac and compare
 		int hmac_compare = compare_mac_archive_overwrite(archivename, hmac_key);
 		if(hmac_compare == 1){
 			fclose(fp);
@@ -55,7 +59,7 @@ int cstore_delete(std::string password, std::string archivename, std::vector<std
 		die("Archive does not exist");
 	}
 
-	// read archive into buffer
+	// Read archive into buffer
 	FILE *archive = fopen(&archivename[0], "rb");
 	std::string archive_contents_name = archivename + "_contents";
 	FILE *archive_contents = fopen(&archive_contents_name[0], "rb");
@@ -68,14 +72,14 @@ int cstore_delete(std::string password, std::string archivename, std::vector<std
 	int contents_length = ftell(archive_contents);
 	rewind(archive_contents);
 
-	// read contents into buffer
+	// Read contents into buffer
 	BYTE archive_buf[archive_length];
 	fread(archive_buf, archive_length, 1, archive);
 	
 	BYTE contents_buf[contents_length];
 	fread(contents_buf, contents_length, 1, archive_contents);
 
-	// transfer buffer to vector
+	// Transfer buffer to vector
 	std::vector<BYTE> archive_vector;
 	for(int i = 0; i < archive_length; i++){
 		archive_vector.push_back(archive_buf[i]);
@@ -86,11 +90,11 @@ int cstore_delete(std::string password, std::string archivename, std::vector<std
 		contents_vector.push_back(contents_buf[i]);
 	}
 
-	// loop through files
+	// Loop through files
 	for(int i = 0; i < filenames.size(); i++){
 		std::string filename = filenames[i];
 
-		// find start and end index of file contents in archive
+		// Find start and end index of file contents in archive
 		std::string haystack(&archive_vector[0], &archive_vector[archive_vector.size()]);
 		int start_index = haystack.find(filename);
 		char *filename_ptr = (char *)(&archive_vector[start_index]);
@@ -99,7 +103,7 @@ int cstore_delete(std::string password, std::string archivename, std::vector<std
 
 		archive_vector.erase(archive_vector.begin()+start_index, archive_vector.begin()+end_index);
 
-		// remove file from archive_contents
+		// Remove file from archive_contents
 		std::string contents_haystack(&contents_vector[0], &contents_vector[contents_vector.size()]);
 		int contents_start_index = contents_haystack.find(filename);
 		int contents_end_index = contents_start_index + 21;
@@ -109,11 +113,11 @@ int cstore_delete(std::string password, std::string archivename, std::vector<std
 	fclose(archive);
 	fclose(archive_contents);
 
-	// compute new HMAC
+	// Compute new HMAC
 	BYTE computed_hmac[SHA256_BLOCK_SIZE];
 	get_hmac(&archive_vector[0], hmac_key, computed_hmac, archive_vector.size());
 
-	// add hmac to archive_vector
+	// Add hmac to archive_vector
 	for(int i = 0; i < SHA256_BLOCK_SIZE; i++){
 		archive_vector.push_back(computed_hmac[i]);
 	}
@@ -121,12 +125,12 @@ int cstore_delete(std::string password, std::string archivename, std::vector<std
 	FILE *archive_write = fopen(&archivename[0], "wb");
 	FILE *archive_contents_write = fopen(&archive_contents_name[0], "wb");
 
-	// write archive_vector to archive
+	// Write archive_vector to archive
 	for(int i = 0; i < archive_vector.size(); i++){
 		fwrite(&archive_vector[i], 1, 1, archive_write);
 	}
 
-	// write to archive_contents
+	// Write to archive_contents
 	for(int i = 0; i < contents_vector.size(); i++){
 		fwrite(&contents_vector[i], 1, 1, archive_contents_write);
 	}
@@ -135,14 +139,4 @@ int cstore_delete(std::string password, std::string archivename, std::vector<std
 	fclose(archive_contents_write);
 
 	return 0;
-
-
-	// Check arguments if you haven't already, see cstore_add 
-	
-	// Crate Key
-	// Compute HMAC
-	
-	// Iterate through archive and see which files to delete
-	
-	// Recompute HMAC, etc.
 }

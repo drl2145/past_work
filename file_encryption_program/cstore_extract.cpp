@@ -12,12 +12,11 @@ typedef unsigned char BYTE;
 
 int cstore_extract(std::string password, std::string archivename, std::vector<std::string> filenames, int filenames_len)
 {
-	// Do Argument Checking
-	// Build Key
-	// Compare HMAC
-	// Loop over archive for files to extract and write to CWD
+	// 1. Build key
+	// 2. Compare HMAC
+	// 3. Loop over archive for files to extract
 
-	// check if files exist in archive
+	// Check if files exist in archive
 	std::string archive_contents_name = archivename + "_contents";
 	FILE *fp = fopen(&archive_contents_name[0], "rb");
 
@@ -25,7 +24,7 @@ int cstore_extract(std::string password, std::string archivename, std::vector<st
 	int contents_length = ftell(fp);
 	rewind(fp);
 
-	// read contents into buffer
+	// Read contents into buffer
 	BYTE contents_buf[contents_length];
 	fread(contents_buf, contents_length, 1, fp);
 
@@ -49,24 +48,24 @@ int cstore_extract(std::string password, std::string archivename, std::vector<st
 	int archive_length = ftell(archive);
 	rewind(archive);
 
-	// read archive into buffer
+	// Read archive into buffer
 	BYTE archive_buf[archive_length];
 	fread(archive_buf, archive_length, 1, archive);
 
-	// get HMAC from archive
+	// Get HMAC from archive
 	BYTE hmac_from_archive[SHA256_BLOCK_SIZE];
 	for(int i = 0; i < SHA256_BLOCK_SIZE; i++){
 		hmac_from_archive[i] = archive_buf[archive_length-SHA256_BLOCK_SIZE+i];
 	}
 
-	// remove HMAC from archive
+	// Remove HMAC from archive
 	BYTE archive_buf_nohmac[archive_length-SHA256_BLOCK_SIZE];
 	for(int i = 0; i < archive_length-SHA256_BLOCK_SIZE; i++){
 		archive_buf_nohmac[i] = archive_buf[i];
 	}
 
-	// HMAC
-	// make key
+	// HMAC:
+	// Make key
 	BYTE computed_hmac[SHA256_BLOCK_SIZE];
 	BYTE hmac_key[SHA256_BLOCK_SIZE];
 	BYTE key_to_hash[SHA256_BLOCK_SIZE+1];
@@ -76,10 +75,10 @@ int cstore_extract(std::string password, std::string archivename, std::vector<st
 	key_to_hash[SHA256_BLOCK_SIZE] = 'I';
 	hash_sha256(key_to_hash, hmac_key, SHA256_BLOCK_SIZE+1);
 
-	// compute HMAC
+	// Compute HMAC
 	get_hmac(archive_buf_nohmac, hmac_key, computed_hmac, archive_length-SHA256_BLOCK_SIZE);
 
-	// compare HMACs
+	// Compare HMACs
 	for(int i = 0; i < SHA256_BLOCK_SIZE; i++){
         if(hmac_from_archive[i] != computed_hmac[i]){
 			fclose(archive);
@@ -87,7 +86,7 @@ int cstore_extract(std::string password, std::string archivename, std::vector<st
         }
     }
 
-	// loop through all files
+	// Loop through all files
 	for(int j = 0; j < filenames_len; j++){
 		// find filename and length
 		std::string filename = filenames[j];
@@ -97,7 +96,7 @@ int cstore_extract(std::string password, std::string archivename, std::vector<st
 		int file_length = *(int *)(filename_ptr+21);
 		int file_begin_index = filename_ptr + 25 - (char *)archive_buf;
 		
-		// find cipher
+		// Find cipher
 		std::vector<BYTE> cipher;
 		for(int i = file_begin_index; i < file_begin_index+file_length; i++){
 			cipher.push_back(archive_buf[i]);
