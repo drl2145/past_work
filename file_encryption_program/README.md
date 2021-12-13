@@ -1,0 +1,2 @@
+## File Encryption Program (cstore)
+This folder contains code from a file encryption project (cstore) used to encrypt (using AES) and store files locally. The program had four main functionalities: add files to an archive, delete files from an archive, list the files in an archive, and extract (decrypt) files from an archive.
