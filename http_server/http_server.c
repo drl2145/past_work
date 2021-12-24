@@ -86,10 +86,10 @@ int main(int argc, char **argv){
 
         // read request
         while(fgets(line, sizeof(line), client) != NULL){
-                strcat(buff, line);
-                if(strstr(buff, "\r\n\r\n") != NULL || strstr(buff, "\n\n") != NULL){
-                    break;
-                }
+            strcat(buff, line);
+            if(strstr(buff, "\r\n\r\n") != NULL || strstr(buff, "\n\n") != NULL){
+                break;
+            }
         }
         if(ferror(client)){
             fprintf(stderr, "ERR: fgets failed\n");
