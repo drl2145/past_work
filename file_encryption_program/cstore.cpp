@@ -9,8 +9,7 @@
 #include <pwd.h>
 #include <unistd.h>
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]){
     // Check correct number of arguments (minimum 3)
     if(argc < 3){
         std::cerr << "Usage: ./cstore <function> [-p password] archivename <files>\n"
@@ -25,8 +24,7 @@ int main(int argc, char* argv[])
     std::string function = argv[1];
     if(function == "list"){
         std::string archivename = argv[2];
-        return cstore_list(archivename);
-
+        return cstore_list(archivename); 
     } else if(function == "add" || function == "extract" || function == "delete"){
         std::string password;
         std::string archivename;

@@ -5,8 +5,7 @@
 
 typedef unsigned char BYTE;
 
-int cstore_delete(std::string password, std::string archivename, std::vector<std::string> filenames)
-{	
+int cstore_delete(std::string password, std::string archivename, std::vector<std::string> filenames){	
     // 1. Create encryption key
     // 2. Compute HMAC
     // 3. Iterate through archive and see which files to delete

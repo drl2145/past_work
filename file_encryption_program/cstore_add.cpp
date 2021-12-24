@@ -4,8 +4,7 @@
 #include "crypto_lib/aes.h"
 #include <unistd.h>
 
-int cstore_add(std::string password, std::string archivename, std::vector<std::string> filenames, int filenames_len)
-{	
+int cstore_add(std::string password, std::string archivename, std::vector<std::string> filenames, int filenames_len){	
     // 1. Create encryption key
     // 2. Check for existing archive
     // 3. If existing archive exists
@@ -25,7 +24,7 @@ int cstore_add(std::string password, std::string archivename, std::vector<std::s
         fseek (fp, 0, SEEK_END);
         int size = ftell(fp);
 
-        if (size == 0) {
+        if (size == 0){
             fclose(fp);
             die("A file is empty");
         }

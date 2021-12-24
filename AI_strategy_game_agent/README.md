@@ -1,0 +1,2 @@
+## AI Strategy Game Agent
+This folder contains my code from an AI project where I designed an agent to play a 2-player strategy game that involves an element of chance. In this game the players take turns to move themselves and throw a trap on a 7x7 board. The aim of the game is to surround your opponent in traps before you are surrounded by traps. My agent uses the Expectiminimax algorithm to decide what moves and traps to make.

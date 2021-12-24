@@ -6,8 +6,7 @@
 
 typedef unsigned char BYTE;
 
-int cstore_list(std::string archivename)
-{
+int cstore_list(std::string archivename){
     if(access(&archivename[0], 0) != 0){
         die("Archive does not exist");
     }

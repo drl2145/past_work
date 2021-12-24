@@ -10,8 +10,7 @@
 
 typedef unsigned char BYTE;
 
-int cstore_extract(std::string password, std::string archivename, std::vector<std::string> filenames, int filenames_len)
-{
+int cstore_extract(std::string password, std::string archivename, std::vector<std::string> filenames, int filenames_len){
     // 1. Build key
     // 2. Compare HMAC
     // 3. Loop over archive for files to extract
