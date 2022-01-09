@@ -1,3 +1,3 @@
 ## Past Work
 
-This repository contains my code from some previous projects/coursework.
+This repository contains my code from several previous projects/coursework.
